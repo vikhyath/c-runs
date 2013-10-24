@@ -11,4 +11,5 @@ c exercises
     3. Fill min heap with a new element from array O(#elements) = O(n^2)
     4. Do steps 2-3 till n*n array is exhausted
     5. Now remove the root from min heap as many times as there are elements left in heap
-- Trie: add, find O(log n)
+
+ - Trie: add, find O(log n)
