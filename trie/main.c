@@ -76,11 +76,12 @@ void trie_add(trie **root, char name[], int val)
 int trie_search(trie **root, char name[])
 {
     trie *parent = *root;
-    int i = 0, found;
+    int i = 0, found = 0;
     for (; i < strlen(name); i++) {
         if (parent->child != NULL) {
             trie *node = parent->child;
             while (node != NULL) {
+                // reset for each loop, we only care about final state of found
                 found = 0;
                 if (name[i] == node->c) {
                     parent = node;
@@ -96,6 +97,7 @@ int trie_search(trie **root, char name[])
             return -1;
         }
     }
+    // key matched
     if (found != 0) {
         return parent->child->val;
     } else {
