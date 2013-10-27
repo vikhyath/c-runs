@@ -12,4 +12,6 @@ c exercises
     4. Do steps 2-3 till n*n array is exhausted
     5. Now remove the root from min heap as many times as there are elements left in heap
 
- - Trie: add, find O(log n)
+ - Trie: add, find and delete O(m), where m is the size of the word being added<br>
+    1. Advantages: BST takes O(mlogn) to add, find and delete words.Because there are logn keys to check and each key has to do m comparisions. Trie is also better than hash because a bad hash collision resolution method with need O(n) comparisions to lookup a key, rather O(mn) if the key is a word and the hash bucket has n keys. Also, we do not need an explicit hash function to resolve buckets and no need of rebuilding hash table if it gets full. We also need less space with tries. Longest prefix matching is easily possible with tries.
+    2. Disadvantages: Tries can be slower in some cases when compared to hash tables for lookups if the data is directly accessed from the disk where the random access time is high.
