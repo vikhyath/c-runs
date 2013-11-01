@@ -17,3 +17,9 @@ c exercises
     2. Disadvantages: Tries can be slower in some cases when compared to hash tables for lookups if the data is directly accessed from the disk where the random access time is high.
  - integer-array-sum: You have two integer arrays. Treat these arrays as if they were big numbers,
 with one digit in each slot. Perform addition on these two arrays and store the results in a new array. Ref: http://www.careercup.com/question?id=6330205329162240
+
+- graph: Simple graph in C, supported operations:
+    1. add_vertex()
+    2. add_edge()
+    3. graph_checkpath(vertex, vertex) # using DFS for now<br>
+Also, starting to use makefiles hereon.
