@@ -3,6 +3,7 @@
     add_vertex()
     add_edge()
     graph_initiate(vertex, vertex) # using DFS for now
+    graph_bfs(vertex) # Using BFS - shortest path to all nodes from a given node
 */
 
 #include <stdio.h>
