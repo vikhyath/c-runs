@@ -194,6 +194,7 @@ bool graph_initiate(ge start, ge end, vertex **root, search_t STRATEGY)
     return false;
 }
 
+// BFS from a given node, will give shortest path to all nodes from the given node
 bool graph_bfs(ge start, vertex *root)
 {
     if (root == NULL) {
