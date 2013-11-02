@@ -33,7 +33,7 @@ void graph_add(ge, vertex**, vertex**);
 void graph_edge(ge, ge, vertex**, vertex**);
 bool graph_check(ge, ge, vertex*);
 bool graph_initiate(ge, ge, vertex**, search_t);
-bool graph_bfs(ge, vertex*);
+bool graph_bfs(vertex*);
 void queue_add(vertex*);
 vertex* queue_pop();
 

@@ -56,10 +56,10 @@ int main(int argc, char **argv)
     printf("path between %c and %c exists? %d\n", 'c', 'h', graph_initiate('c', 'h', &root, DFS));
 
     printf("shortest path between all nodes:\n");
-    printf("BFS from node %c exists? %d\n", 'b', graph_initiate('b', 'e', &root, BFS));
-    printf("BFS from node %c exists? %d\n", 'a', graph_initiate('a', 'e', &root, BFS));
-    printf("BFS from node %c exists? %d\n", 'x', graph_initiate('x', 'e', &root, BFS));
-    printf("BFS from node %c exists? %d\n", 'c', graph_initiate('c', 'e', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'b', graph_initiate('b', '\0', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'a', graph_initiate('a', '\0', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'x', graph_initiate('x', '\0', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'c', graph_initiate('c', '\0', &root, BFS));
 
     return 0;
 }
@@ -189,13 +189,13 @@ bool graph_initiate(ge start, ge end, vertex **root, search_t STRATEGY)
     if (STRATEGY == BFS) {
         queueroot = NULL;
         queuetail = NULL;
-        return graph_bfs(start, begin);
+        return graph_bfs(begin);
     }
     return false;
 }
 
 // BFS from a given node, will give shortest path to all nodes from the given node
-bool graph_bfs(ge start, vertex *root)
+bool graph_bfs(vertex *root)
 {
     if (root == NULL) {
         return false;
