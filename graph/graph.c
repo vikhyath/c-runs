@@ -2,7 +2,7 @@
     Simple graph in C, supported operations:
     add_vertex()
     add_edge()
-    graph_checkpath(vertex, vertex) # using DFS for now
+    graph_initiate(vertex, vertex) # using DFS for now
 */
 
 #include <stdio.h>
@@ -29,6 +29,9 @@ int main(int argc, char **argv)
     graph_add('c', &root, &last);
     graph_add('d', &root, &last);
     graph_add('e', &root, &last);
+    graph_add('f', &root, &last);
+    graph_add('g', &root, &last);
+    graph_add('h', &root, &last);
 
     graph_edge('a', 'b', &root, &last);
     graph_edge('a', 'c', &root, &last);
@@ -37,14 +40,26 @@ int main(int argc, char **argv)
     graph_edge('a', 'e', &root, &last);
     graph_edge('c', 'd', &root, &last);
     graph_edge('d', 'e', &root, &last);
+    graph_edge('d', 'f', &root, &last);
+    graph_edge('d', 'g', &root, &last);
+    graph_edge('c', 'h', &root, &last);
 
-    printf("path between %c and %c exists? %d\n", 'a', 'e', graph_checkpath('a', 'e', &root));
-    printf("path between %c and %c exists? %d\n", 'd', 'e', graph_checkpath('d', 'e', &root));
-    printf("path between %c and %c exists? %d\n", 'c', 'e', graph_checkpath('c', 'e', &root));
-    printf("path between %c and %c exists? %d\n", 'b', 'e', graph_checkpath('b', 'e', &root));
-    printf("path between %c and %c exists? %d\n", 'b', 'a', graph_checkpath('b', 'a', &root));
-    printf("path between %c and %c exists? %d\n", 'f', 'a', graph_checkpath('f', 'a', &root));
-    printf("path between %c and %c exists? %d\n", 'b', 'f', graph_checkpath('b', 'f', &root));
+    printf("path between %c and %c exists? %d\n", 'a', 'e', graph_initiate('a', 'e', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'd', 'e', graph_initiate('d', 'e', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'c', 'e', graph_initiate('c', 'e', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'b', 'e', graph_initiate('b', 'e', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'b', 'a', graph_initiate('b', 'a', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'f', 'a', graph_initiate('f', 'a', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'b', 'f', graph_initiate('b', 'f', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'd', 'f', graph_initiate('d', 'f', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'd', 'g', graph_initiate('d', 'g', &root, DFS));
+    printf("path between %c and %c exists? %d\n", 'c', 'h', graph_initiate('c', 'h', &root, DFS));
+
+    printf("shortest path between all nodes:\n");
+    printf("BFS from node %c exists? %d\n", 'b', graph_initiate('b', 'e', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'a', graph_initiate('a', 'e', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'x', graph_initiate('x', 'e', &root, BFS));
+    printf("BFS from node %c exists? %d\n", 'c', graph_initiate('c', 'e', &root, BFS));
 
     return 0;
 }
@@ -119,6 +134,10 @@ void graph_edge(ge from, ge to, vertex **root, vertex **last)
     printf("added edge %c%c\n", node->link->element, node->nextedge->link->element);
 }
 
+// currently implemented in DFS
+// this approach will not give if there are loops in a directed graph, primariy because we just use white and black (1 or 0)
+// coloring scheme. if we introduce a white, black and gray scheme then it is possible to detect, because we will not be having
+// any false positives
 bool graph_check(ge start, ge end, vertex *parent)
 {
     if (parent->element == end) {
@@ -146,7 +165,7 @@ bool graph_check(ge start, ge end, vertex *parent)
     return op;
 }
 
-bool graph_checkpath(ge start, ge end, vertex **root)
+bool graph_initiate(ge start, ge end, vertex **root, search_t STRATEGY)
 {
     // first set all visited flags to 0
     // record where we need to start our search
@@ -164,5 +183,66 @@ bool graph_checkpath(ge start, ge end, vertex **root)
         return false;
     }
     printf("current search starts at %c\n", begin->element);
-    return graph_check(start, end, begin);
+    if (STRATEGY == DFS) {
+        return graph_check(start, end, begin);
+    }
+    if (STRATEGY == BFS) {
+        queueroot = NULL;
+        queuetail = NULL;
+        return graph_bfs(start, begin);
+    }
+    return false;
+}
+
+bool graph_bfs(ge start, vertex *root)
+{
+    if (root == NULL) {
+        return false;
+    }
+    queue_add(root);
+    root->visited = 1;
+    while (queueroot != NULL) {
+        vertex *tempnode = queue_pop();
+        printf("%c->", tempnode->element);
+        edge *tempedge = tempnode->nextedge;
+        while (tempedge != NULL) {
+            if (tempedge->link->visited != 1) {
+                queue_add(tempedge->link);
+                tempedge->link->visited = 1;
+            }
+            tempedge = tempedge->nextedge;
+        }
+    }
+    printf("\n");
+    return true;
+}
+
+void queue_add(vertex *current)
+{
+    queue *node = malloc(sizeof(*node));
+    node->currentvertex = current;
+    node->next = NULL;
+    if (queueroot == NULL) {
+        queueroot = node;
+        queuetail = node;
+    }
+    else {
+        queuetail->next = node;
+        queuetail = node;
+    }
+}
+
+vertex* queue_pop()
+{
+    if (queueroot == NULL) {
+        return NULL;
+    }
+    queue *node = queueroot;
+    queueroot = queueroot->next;
+
+    if (queueroot == NULL) {
+        queuetail = NULL;
+    }
+
+    return node->currentvertex;
 }
