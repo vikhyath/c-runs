@@ -4,6 +4,7 @@
     add_edge()
     graph_initiate(vertex, vertex) # using DFS for now
     graph_bfs(vertex) # Using BFS - shortest path to all nodes from a given node
+    is_graph_euler(vertex *root) # checks if a given graph is euler/semi/none using DFS and connected components theory. Currenly only for undirected graphs.
 */
 
 #include <stdio.h>
