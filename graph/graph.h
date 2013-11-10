@@ -22,7 +22,8 @@ typedef struct gqueue {
 
 typedef enum {
     DFS,
-    BFS
+    BFS,
+    EULER
 } search_t;
 
 queue *queueroot;
@@ -36,5 +37,9 @@ bool graph_initiate(ge, ge, vertex**, search_t);
 bool graph_bfs(vertex*);
 void queue_add(vertex*);
 vertex* queue_pop();
+int is_graph_euler(vertex*);
+int is_connected(vertex*);
+void graph_dfs(vertex*);
+int get_edge_count(vertex*);
 
 #endif
