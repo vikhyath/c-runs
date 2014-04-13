@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define FILESIZE 10 * 1000 * 1024
+#define FILESIZE 10 * 1024
 typedef struct _file_ {
   int pins; // number of pins on the file
   const char *file_name; // file name
