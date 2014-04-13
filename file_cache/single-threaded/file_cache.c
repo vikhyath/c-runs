@@ -275,38 +275,3 @@ char *file_cache_mutable_file_data(file_cache *fct, const char *file_name)
     // undefined behaviour
     return NULL;
 }
-
-/*int main(int argc, char **argv)
-{
-    file_cache *fct = file_cache_construct(3);
-    const char *file_names[] = {"one","two","three"};
-    file_cache_pin_files(fct, file_names, 3);
-    char *y = file_cache_mutable_file_data(fct, "one");
-    const char *testfiles[] = {"one"};
-    //file_cache_unpin_files(fct, testfiles, 1);
-    const char* newfile[] = {"four"};
-    file_cache_pin_files(fct, newfile, 1);
-    file_cache_destroy(fct);
-*/
-
-    /*int i = 0;
-    for (i = 0; i < 3; i++) {
-      printf("file %s\n", fct->file_struct[i]->file_name);
-      getchar();
-      printf("content is %s\n", fct->file_struct[i]->content);
-
-      }*/
-    /*    write_to_disk(fct->file_struct[0]);
-    const char *x = file_cache_file_data(fct, "one");
-    printf("%p\n", x);
-    char *y = file_cache_mutable_file_data(fct, "one");
-    y[FILESIZE - 1] = '1';
-    write_to_disk(fct->file_struct[0]);
-    y = file_cache_mutable_file_data(fct, "one");
-    // printf("%s\n", y);
-    const char* newfile[] = {"four"};
-    file_cache_pin_files(fct, newfile, 1);
-    */
-/*    return 0;
-}
-*/
