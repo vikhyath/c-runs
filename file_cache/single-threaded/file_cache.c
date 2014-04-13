@@ -3,6 +3,7 @@
  * a) When a cache is destroyed, even if there are pins on files, they are ignored and dirty files are written to disk.
  * b) If there are multiple calls to write to the file_memory, when the file is unpinned by one call, it will be written to disk only if the number of pins on the file are 0.
  * c) file_cache_destroy will flush all dirty buffers to disk whether or not there are other pins to files.
+ * d) FILESIZE is ALWAYS 10KB, whether it is a user supplied file or if it is a file that is created by filling 0s
  */
 
 #include <stdio.h>
