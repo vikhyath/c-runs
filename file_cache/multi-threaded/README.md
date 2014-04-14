@@ -22,7 +22,7 @@
  * g) multiple threads may read/write from/to a file and as per the given problem statement, the program *DOES NOT* need to handle this case
  * h) destroy can ONLY be called by one thread, since the interface takes the argument file_cache *, but not the actual address of file_cache (file_cache ** type) which can be used to set file_cache * to NULL across all threads
 
-#### Improvements 
+#### Improvements if there was more time
  * a) Further optimize mutex_lock and mutex_unlock on cache (i.e., reduce code block size between the lock & unlock operations) that can boost cache performance.
  * b) Handle destroy called on same file_cache* by multiple threads. That is, point to the address of file_cache* and set to NULL. Once a destroy is called the second time, check if the file_cache* is NULL. If yes, then just return. The variable file_cache->actual_size can be used to check active cached file entries before doing a destroy.
  * c) Instead of freeing memory held by a previous file entry in the cache and mallocing it again for a new entry, we can overwrite the old memory and save us the trouble of doing a free + malloc operation again.
