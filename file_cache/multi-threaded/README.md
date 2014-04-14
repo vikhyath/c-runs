@@ -26,4 +26,5 @@
  * a) Further optimize mutex_lock and mutex_unlock on cache (i.e., reduce code block size between the lock & unlock operations) that can boost cache performance.
  * b) Handle destroy called on same file_cache* by multiple threads. That is, point to the address of file_cache* and set to NULL. Once a destroy is called the second time, check if the file_cache* is NULL. If yes, then just return. The variable file_cache->actual_size can be used to check active cached file entries before doing a destroy.
  * c) Instead of freeing memory held by a previous file entry in the cache and mallocing it again for a new entry, we can overwrite the old memory and save us the trouble of doing a free + malloc operation again.
- * d) Better handle file read/write operations.
+ * d) Instead of doing a sleep() waiting for resource, we can use additional mutexes to sync threads. This will save processor time. 
+ * e) Better handle file read/write operations.
