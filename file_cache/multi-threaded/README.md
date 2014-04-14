@@ -28,3 +28,8 @@
  * c) Instead of freeing memory held by a previous file entry in the cache and mallocing it again for a new entry, we can overwrite the old memory and save us the trouble of doing a free + malloc operation again.
  * d) Instead of doing a sleep() waiting for resource, we can use additional mutexes to sync threads. This will save processor time. 
  * e) Better handle file read/write operations.
+
+#### Debugging
+ * a) Most common scenario where multi threaded programs actually run into problems is synchronization. Checking if locks on mutexes are being released in the correct way will solve most of these types of problems.
+ * b) File I/O operations can go wrong if care is not taken to read the last character, especially when it comes to dealing with \0's.
+ * c) Also, when constantly checking for a resource, before going to sleep() it is a MUST to make sure that the lock on the mutex is given away, else the program hangs.
