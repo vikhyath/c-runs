@@ -100,6 +100,8 @@ void read_from_disk(file *target)
  */
 void file_cache_destroy(file_cache *fct)
 {
+    // make sure no other thread is in between doing something else
+    pthread_mutex_lock(&(fct->mutex));
     size_t i;
     // for every file in cache, if it is dirty, write contents to disk
     for (i = 0; i < fct->max_size; i++) {
@@ -115,9 +117,8 @@ void file_cache_destroy(file_cache *fct)
       free(fct->file_struct[i]);
     }
     fct->max_size = 0;
-    // destroy mutexes and free file cache
+    // unlock mutex and free file_cache
     pthread_mutex_unlock(&(fct->mutex));
-    pthread_mutex_destroy(&(fct->mutex));
     free(fct);
     fct = NULL;
 }
@@ -217,7 +218,7 @@ void file_cache_pin_files(file_cache *fct, const char **files, int num_files)
             free(fct->file_struct[idx]);
             fct->file_struct[idx] = NULL;
         }
-
+        // Yep! this can be improved by simply overwriting the old memory
         // allocate space
         fct->file_struct[idx] = malloc(sizeof(file));
 

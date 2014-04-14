@@ -14,7 +14,7 @@ typedef struct _file_ {
 
 typedef struct file_cache_t {
   int max_size; // max_size of the cache, set in constructor
-  int actual_size; // actual entries in cache, useful to check entries in cache while dealing with multiple threads and cache_destroy prevention.
+  int actual_size; // actual entries in cache. Useful to check entries in cache while dealing with multiple threads and prevent cache_destroy from multiple threads at the same time (NOT CURRENTLY USED).
   file **file_struct; // file structrues that exist in the cache
   pthread_mutex_t mutex;
 } file_cache;
