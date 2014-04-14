@@ -7,7 +7,8 @@
  * e) to unpin a file is to reduce the number of pin count inside the file structrue (please see header file), a file is *unpinned* if the pin count on the file is 0.
  * f) the client application is responsible for ensuring it does not lock all files in the cache for writing and thus making the files not usable by other threads.
  * g) multiple threads may read/write from/to a file and as per the given problem statement, the program *DOES NOT* need to handle this case
- * h) destroy can ONLY be called by one thread, since the interface takes the argument file_cache *, but not the actual address of file_cache (file_cache ** type) which can be used to set file_cache * to NULL across all threads
+ * h) destroy can ONLY be called by one thread, since the interface takes the argument file_cache *, but not the actual address of file_cache (file_cache ** type) which can be used to set file_cache * to NULL across all threads.
+ * i) dirty files are written to disk only when destroy is called or if the pin count becomes 0.
  */
 
 #include <stdio.h>
@@ -56,6 +57,7 @@ void write_to_disk(file *target)
         printf("File Write Error\n!");
         exit(1);
     }
+
     fprintf(fptr, "%s", target->content);
     fclose(fptr);
 }
@@ -261,11 +263,9 @@ void file_cache_unpin_files(file_cache *fct, const char **files, int num_files)
         // file found and it has been pinned before
         if (NULL != loc && loc->pins > 0) {
             (loc->pins)--;
-            if (true == loc->dirty) {
+            if (true == loc->dirty && 0 == loc->pins) {
+                write_to_disk(loc);
                 loc->dirty = false;
-                if (0 == loc->pins) {
-                    write_to_disk(loc);
-                }
             }
             if (0 == loc->pins) {
                 // also decrement the actual cached files count since this is technically a clean entry which can be reused for caching other files
