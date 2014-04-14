@@ -1,7 +1,7 @@
 ### File Caching
 
 #### testdriver.c & testdriver_2.c
-    Assertions plus drivers to test file_cache.c that implements the file cache.
+    Assertions plus drivers to test file_cache.c that implements the file cache. Please update Make file with the correct driver (testdriver vs testdriver_2) before running.
 
 #### file_cache.c
     File cache implementation.
