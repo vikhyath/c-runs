@@ -100,16 +100,6 @@ void read_from_disk(file *target)
  */
 void file_cache_destroy(file_cache *fct)
 {
-    // If there are active entries in the cache by other or the current thread, then do not destroy. Destroy cache only if there are no active entries, that is all files have been unpinned
-    while(1) {
-        pthread_mutex_lock(&(fct->mutex));
-        if (fct->actual_size > 0) {
-            pthread_mutex_unlock(&(fct->mutex));
-            sleep(1);
-        } else {
-            break;
-        }
-    }
     size_t i;
     // for every file in cache, if it is dirty, write contents to disk
     for (i = 0; i < fct->max_size; i++) {
@@ -257,13 +247,13 @@ void file_cache_unpin_files(file_cache *fct, const char **files, int num_files)
     //      else undefined behaviour
     size_t idx;
     for (idx = 0; idx < num_files; idx++) {
+        // lockdown to prevent duplicate removals
+        pthread_mutex_lock(&(fct->mutex));
         // check if file exists in cache
         file *loc = find_in_cache(fct, files[idx]);
         // file found and it has been pinned before
         if (NULL != loc && loc->pins > 0) {
-            pthread_mutex_lock(&(fct->mutex));
             (loc->pins)--;
-            pthread_mutex_unlock(&(fct->mutex));
             if (true == loc->dirty) {
                 loc->dirty = false;
                 if (0 == loc->pins) {
@@ -272,11 +262,10 @@ void file_cache_unpin_files(file_cache *fct, const char **files, int num_files)
             }
             if (0 == loc->pins) {
                 // also decrement the actual cached files count since this is technically a clean entry which can be reused for caching other files
-                pthread_mutex_lock(&(fct->mutex));
                 fct->actual_size--;
-                pthread_mutex_unlock(&(fct->mutex));
             }
         }
+        pthread_mutex_unlock(&(fct->mutex));
     }
 }
 
@@ -287,13 +276,18 @@ void file_cache_unpin_files(file_cache *fct, const char **files, int num_files)
  */
 const char *file_cache_file_data(file_cache *fct, const char *file_name)
 {
+    // Need a lock on cache because some other thread might try to clear the cache entry before we can even return the data
+    pthread_mutex_lock(&(fct->mutex));
     file *loc = find_in_cache(fct, file_name);
+    const char *data;
     // found file and it has been pinned
     if (NULL != loc && loc->pins > 0) {
-        return (const char*)loc->content;
+        data = (const char*)loc->content;
+    } else { // undefined behavior
+        data = NULL;
     }
-    // undefined behaviour
-    return NULL;
+    pthread_mutex_unlock(&(fct->mutex));
+    return data;
 }
 
 /*
@@ -303,12 +297,17 @@ const char *file_cache_file_data(file_cache *fct, const char *file_name)
  */
 char *file_cache_mutable_file_data(file_cache *fct, const char *file_name)
 {
+    // Need a lock on cache because some other thread might try to clear the cache entry before we can even return the data
+    pthread_mutex_lock(&(fct->mutex));
     file *loc = find_in_cache(fct, file_name);
     // found file and it has been pinned, set the dirty flag to true on the file
+    char *data;
     if (NULL != loc && loc->pins > 0) {
         loc->dirty = true;
-        return loc->content;
+        data = loc->content;
+    } else { // undefined behavior
+        data = NULL;
     }
-    // undefined behaviour
-    return NULL;
+    pthread_mutex_unlock(&(fct->mutex));
+    return data;
 }

@@ -8,9 +8,15 @@ file_cache *fct;
 void test(void *x)
 {
     int *idx = (int*) x;
-    const char *file_names[] = {"one","two","three"};
+    const char *file_names[] = {"five","six","seven"};
     file_cache_pin_files(fct, file_names, 3);
-    printf("count of pins on file one is %d\n", fct->file_struct[0]->pins);
+    if (*idx == 0) {
+        file_cache_destroy(fct);
+    }
+
+    file_cache_unpin_files(fct, file_names, 3);
+    const char *test[] = {"eight"};
+    file_cache_pin_files(fct, test, 1);
 }
 
 int main(int argc, char **argv)
