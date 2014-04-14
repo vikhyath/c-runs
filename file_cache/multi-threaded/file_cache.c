@@ -148,26 +148,32 @@ file* find_in_cache(file_cache *fct, const char *name)
  */
 int findspot_in_cache(file_cache *fct)
 {
-    int idx;
-    for (idx = 0; idx < fct->max_size; idx++) {
-        // vacant spot
-        if (NULL == fct->file_struct[idx]) {
-            return idx;
+    // try to get the lock, BLOCKING call until space is found for the thread
+    while (1) {
+        int idx = 0;
+        for (idx = 0; idx < fct->max_size; idx++) {
+            // vacant spot
+            if (NULL == fct->file_struct[idx]) {
+                return idx;
+            }
+
+            // dirty or pins > 0, keep looking
+            if (true == fct->file_struct[idx]->dirty || fct->file_struct[idx]->pins > 0) {
+                continue;
+            }
+
+            // pins == 0, valid entry, return idx
+            if (0 == fct->file_struct[idx]->pins) {
+                return idx;
+            }
         }
 
-        // dirty or pins > 0, keep looking
-        if (true == fct->file_struct[idx]->dirty || fct->file_struct[idx]->pins > 0) {
-            continue;
-        }
-
-        // pins == 0, valid entry, return idx
-        if (0 == fct->file_struct[idx]->pins) {
-            return idx;
-        }
+        // not found, so sleep after releasing lock
+        pthread_mutex_unlock(&(fct->mutex));
+        sleep(1);
+        // take back lock and continue search
+        pthread_mutex_lock(&(fct->mutex));
     }
-
-    // not found
-    return -1;
 }
 
 

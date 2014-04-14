@@ -10,13 +10,31 @@ void test(void *x)
     int *idx = (int*) x;
     const char *file_names[] = {"five","six","seven"};
     file_cache_pin_files(fct, file_names, 3);
+    /*
+      if (*idx == 0) {
+          file_cache_destroy(fct);
+      }
+    */
+
+    // file_cache_unpin_files(fct, file_names, 3);
+
+    // test to simulate blocking call on a thread that is going to find a valid entry in the file_cache to put a new file called "eight"
     if (*idx == 0) {
-        file_cache_destroy(fct);
+        printf("Simulating blocking call on a thread that is looking for a valid cache entry to load a new file...\n");
+        const char *test[] = {"eight"};
+        file_cache_pin_files(fct, test, 1);
+        printf("Found a spot, done loading new file in the cache\n");
     }
 
-    file_cache_unpin_files(fct, file_names, 3);
-    const char *test[] = {"eight"};
-    file_cache_pin_files(fct, test, 1);
+    // supporting simulation of a blocking call. over here, we sleep for 5 seconds and then unpin file "five" three times to get the pin count of file "five" to 0, which then makes thread 0 insert file "eight" in the cache.
+    if (*idx == 2) {
+        sleep(5);
+        const char *test[] = {"five"};
+        printf("Creating a vacancy in the cache by unpinning file 'five'\n");
+        file_cache_unpin_files(fct, test, 1);
+        file_cache_unpin_files(fct, test, 1);
+        file_cache_unpin_files(fct, test, 1);
+    }
 }
 
 int main(int argc, char **argv)
